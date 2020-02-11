@@ -7,8 +7,12 @@ from bson.objectid import ObjectId
 import random
 from datetime import date
 import numpy as np
+from flask_cors import CORS, cross_origin
+
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 POTHOLE_ID = "pothole_id"
 LATITUDE = 'latitude'
@@ -247,7 +251,6 @@ def checkIfPothole():
     json_data = request.get_json()
     print(type(json_data))
     print(json_data)
-    print(json_data['speed'])
     a = random.randrange(2)
     if(a==0):
         return "True"
@@ -279,11 +282,15 @@ def getPotholes():
 # Get an individual active pothole based on it's id
 @app.route('/pothole/<id>',methods=['GET'])
 def getPothole(id):
-    print("Type 1 ",type(id))
+    print(id)
     pothole_details = POTHOLE_EXISTING.find({"_id" : ObjectId(id)})
+    print(type(pothole_details))
+
     for x in pothole_details:
+        print("VDUDUVDFVYUDVUD ",x)
         res = json.dumps(x, default=json_util.default)
-    return res
+        return res
+    return "POthole not found"
 
 # Resolve a Pothole 
 # Add it to new resolved database with counter 0 and remove it from main database
@@ -339,11 +346,12 @@ def getPotholeResolved(id):
 @app.route('/repair',methods = ['POST'])
 def repairRequest():
     json_data = request.get_json()
-    #print(type(json_data))
+    print(type(json_data))
     json_string = json.dumps(json_data)
-    #print(type(json_string))
+    print(type(json_string))
     parsed_json = (json.loads(json_string))
-    
+    print(parsed_json)
+
     createDate = parsed_json['createDate']
     companyAlloted = parsed_json['company']
     budget = parsed_json['budget']
